@@ -71,6 +71,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'web_django.wsgi.application'
 
 import environ
+env = environ.Env()
+environ.Env.read_env()
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -78,9 +80,9 @@ import environ
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mytestdb',
-        'USER': 'kazakovas',
-        'PASSWORD': 'kaz7301',
+        'NAME': env('dbname'),
+        'USER': env('login'),
+        'PASSWORD': env('password'),
         'HOST': 'localhost',
         'PORT': '3306'
     }
