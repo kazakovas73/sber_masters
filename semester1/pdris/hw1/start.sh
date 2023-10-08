@@ -4,6 +4,11 @@ echo "START script PID: $$"
 regexpid="(?<=_).*?(?=\.)"
 pwd=$(pwd)
 logsdir="$pwd/logs/"
+pidfilename="pid.txt"
+
+if [ ! -s "$pidfilename" ]; then 
+    echo -n "$$" >> "$pidfilename"
+fi
 
 while true
 do
@@ -11,14 +16,16 @@ do
     memUsage=$(free -m | awk '/Mem/{print $3}')
 
     if [ -z "$(ls -A $logsdir)" ]; then
-        touch "$logsdir/log(0)_$$.csv"
+        touch "$logsdir/log_0.csv"
     else
         filescnt=$(ls -l "logs" | grep ^- | wc -l)
-        lastlogfilename=$(ls "logs" | sort -V | tail -n 1)
-        lastpid=$(echo $lastlogfilename | grep -Po $regexpid)
+        lastpid=$(grep "." $pidfilename | tail -1)
 
-        if [ "$$" != "$lastpid" ]; then
-            touch "$logsdir/log($filescnt)_$$.csv"
+        #echo "$$ $lastpid"
+        if [ $$ != $lastpid ]; then
+            touch "$logsdir/log_$filescnt.csv"
+            echo -n > "$pidfilename"
+            echo -n "$$" >> "$pidfilename"
         fi
     fi
     name=$(ls "$logsdir" | sort -V | tail -n 1)
