@@ -79,12 +79,12 @@ environ.Env.read_env()
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('dbname'),
-        'USER': env('login'),
-        'PASSWORD': env('password'),
-        'HOST': 'localhost',
-        'PORT': '3306'
+        'ENGINE': env('POSTGRES_ENGINE'),
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': int(env('POSTGRES_PORT'))
     }
 }
 
