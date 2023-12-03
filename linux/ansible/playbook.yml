@@ -1,0 +1,46 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Выгрузка html файла index
+      command: docker cp app-application-1:/index.html ./index.html
+
+    - name: Выгрузка py файла run
+      command: docker cp app-application-1:/run.py ./run.py
+
+    - name: Запуск временного контейнера для копирования файлов
+      docker_container:
+        name: temp-container-for-copy
+        image: alpine
+        volumes:
+          - py-volume:/app
+        command: sleep 3600
+        detach: yes
+
+    - name: Копирование index.html в volume
+      command: docker cp ./index.html temp-container-for-copy:/app/index.html
+
+    - name: Копирование run.py в volume
+      command: docker cp ./run.py temp-container-for-copy:/app/run.py
+
+    - name: Остановка временного контейнера
+      docker_container:
+        name: temp-container-for-copy
+        state: absent
+
+    - name: Запуск первого Docker контейнера
+      docker_container:
+        name: py-app-service-1
+        image: python:3.8.3-alpine
+        command: python3 /app/run.py
+        volumes:
+          - py-volume:/app
+        detach: yes
+
+    - name: Запуск второго Docker контейнера
+      docker_container:
+        name: py-app-service-2
+        image: python:3.8.3-alpine
+        command: python3 /app/run.py runserver 0.0.0.0:8000
+        volumes:
+          - py-volume:/app
+        detach: yes
